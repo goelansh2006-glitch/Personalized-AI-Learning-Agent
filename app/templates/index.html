@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CogniPath AI — Autonomous Personalized AI Learning Agent</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              900: '#312e81',
+              950: '#1e1b4b',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="/static/css/custom.css">
+</head>
+<body class="bg-[#0b0f19] text-slate-100 min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+  <!-- Header Navigation -->
+  <header class="sticky top-0 z-40 w-full glass-panel border-b border-slate-800/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white text-lg font-bold shadow-lg shadow-indigo-600/30">
+          <i class="fas fa-brain"></i>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-base font-extrabold tracking-tight text-white">CogniPath <span class="text-indigo-400">AI</span></h1>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-mono bg-indigo-950 text-indigo-300 border border-indigo-500/30">PS04</span>
+          </div>
+          <p class="text-[11px] text-slate-400">Autonomous Personalized AI Learning Agent</p>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="hidden md:flex items-center space-x-1 p-1 rounded-xl bg-slate-900/80 border border-slate-800 text-xs">
+        <button type="button" class="nav-tab px-3 py-1.5 rounded-lg border font-medium transition bg-indigo-600/20 text-indigo-400 border-indigo-500/50" data-target="profile">
+          <i class="fas fa-sliders-h mr-1.5"></i>1. Diagnose & Profile
+        </button>
+        <button type="button" class="nav-tab px-3 py-1.5 rounded-lg border font-medium transition text-slate-400 border-transparent hover:text-slate-200" data-target="matrix">
+          <i class="fas fa-microscope mr-1.5"></i>2. Gap Matrix
+        </button>
+        <button type="button" class="nav-tab px-3 py-1.5 rounded-lg border font-medium transition text-slate-400 border-transparent hover:text-slate-200" data-target="roadmap">
+          <i class="fas fa-project-diagram mr-1.5"></i>3. Adaptive Skill Tree
+        </button>
+        <button type="button" class="nav-tab px-3 py-1.5 rounded-lg border font-medium transition text-slate-400 border-transparent hover:text-slate-200" data-target="assessment">
+          <i class="fas fa-tasks mr-1.5"></i>4. Assessment
+        </button>
+        <button type="button" class="nav-tab px-3 py-1.5 rounded-lg border font-medium transition text-slate-400 border-transparent hover:text-slate-200" data-target="tutor">
+          <i class="fas fa-user-graduate mr-1.5"></i>5. Socratic Tutor
+        </button>
+      </nav>
+
+      <!-- Right Action Items -->
+      <div class="flex items-center space-x-3">
+        <div class="hidden sm:flex items-center space-x-2 text-[11px] text-slate-400 px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span>Multi-Agent Active</span>
+        </div>
+        <button type="button" id="btn-export-plan" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 font-medium transition border border-slate-700 flex items-center">
+          <i class="fas fa-download mr-1.5 text-indigo-400"></i>Export Plan
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- SECTION 1: Profile & Diagnostic Baseline -->
+    <section id="section-profile" class="app-section">
+      <!-- Quick Demo Presets Banner -->
+      <div class="mb-6 p-4 rounded-2xl glass-card border border-indigo-500/20">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center space-x-2">
+            <i class="fas fa-bolt text-indigo-400 text-sm"></i>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-200">1-Click Live Demo Presets</h3>
+          </div>
+          <span class="text-[11px] text-slate-400">Instant setup for hackathon stage pitch</span>
+        </div>
+        <div id="preset-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Left Column: Learner Profile Details -->
+        <div class="lg:col-span-6 glass-card rounded-2xl p-6 border border-slate-800/80">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-bold text-slate-100 flex items-center">
+              <i class="fas fa-user-circle text-indigo-400 mr-2"></i>Learner Context & Goals
+            </h3>
+            <span class="text-[11px] text-slate-400">Step 1 of 5</span>
+          </div>
+
+          <div class="space-y-4 text-xs">
+            <div>
+              <label class="block font-medium text-slate-300 mb-1">Learner Name</label>
+              <input type="text" id="input-name" value="Alex Rivera" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-100 focus:outline-none focus:border-indigo-500">
+            </div>
+
+            <div>
+              <label class="block font-medium text-slate-300 mb-1">Target Subject / Topic</label>
+              <input type="text" id="input-subject" value="Python & Algorithmic Problem Solving" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-100 focus:outline-none focus:border-indigo-500">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block font-medium text-slate-300 mb-1">Current Experience Level</label>
+                <select id="input-level" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-100 focus:outline-none focus:border-indigo-500">
+                  <option value="Beginner">Beginner (Foundations)</option>
+                  <option value="Intermediate" selected>Intermediate (Practitioner)</option>
+                  <option value="Advanced">Advanced (Architect)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-medium text-slate-300 mb-1">Weekly Time Budget</label>
+                <select id="input-hours" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-100 focus:outline-none focus:border-indigo-500">
+                  <option value="3">3 hours/week (Light)</option>
+                  <option value="6" selected>6 hours/week (Standard)</option>
+                  <option value="12">12+ hours/week (Intensive)</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="block font-medium text-slate-300 mb-1">Target Mastery Goal</label>
+              <input type="text" id="input-goal" value="Master dynamic programming, memoization, and graph state traversal for technical coding interviews" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-100 focus:outline-none focus:border-indigo-500">
+            </div>
+
+            <div>
+              <label class="block font-medium text-slate-300 mb-1">Preferred Learning Style</label>
+              <select id="input-style" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-100 focus:outline-none focus:border-indigo-500">
+                <option value="Hands-on & Code-First" selected>Hands-on & Code-First (Interactive practice)</option>
+                <option value="Visual & Spatial">Visual & Spatial (Diagrams & State machines)</option>
+                <option value="Theoretical & Mathematical">Theoretical & Mathematical (Invariants & Proofs)</option>
+                <option value="Socratic & Conversational">Socratic & Conversational (Guided inquiry)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block font-medium text-slate-300 mb-1">Self-Reported Prior Knowledge / Friction Points</label>
+              <textarea id="input-prior" rows="3" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-100 focus:outline-none focus:border-indigo-500 text-xs">Familiar with basic Python syntax and loops, but struggle to identify overlapping subproblems in dynamic programming and often produce exponential recursive calls instead of optimal memoized transitions.</textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Diagnostic Probe Questions & Execution -->
+        <div class="lg:col-span-6 glass-card rounded-2xl p-6 border border-slate-800/80 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-sm font-bold text-slate-100 flex items-center">
+                <i class="fas fa-stethoscope text-indigo-400 mr-2"></i>Adaptive Diagnostic Probes
+              </h3>
+              <span class="px-2 py-0.5 rounded bg-slate-800 text-[10px] text-slate-400">Pre-Assessment</span>
+            </div>
+            <p class="text-xs text-slate-400 mb-4">
+              Our Diagnostic Agent generates targeted probes to detect cognitive friction and misconceptions before architecting your learning path.
+            </p>
+
+            <div id="probes-container" class="space-y-3 mb-6">
+              <!-- Dynamically rendered probe questions -->
+            </div>
+          </div>
+
+          <div class="pt-4 border-t border-slate-800">
+            <button type="button" id="btn-run-diagnosis" class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition shadow-lg shadow-indigo-600/30 flex items-center justify-center">
+              <i class="fas fa-dna mr-2"></i>Run Multi-Agent Diagnostic & Gap Analysis
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: Knowledge Gap Matrix & Bloom's Radar -->
+    <section id="section-matrix" class="app-section hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Left: Gap Matrix Table -->
+        <div class="lg:col-span-8 glass-card rounded-2xl p-6 border border-slate-800/80">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div>
+              <span class="text-[10px] font-mono uppercase tracking-wider text-indigo-400 font-semibold">Diagnostic Report</span>
+              <h3 class="text-base font-bold text-slate-100 flex items-center">
+                Knowledge Gap Profile: <span id="diag-subject-badge" class="ml-2 text-indigo-400">Python & Algorithms</span>
+              </h3>
+            </div>
+            <div class="flex items-center space-x-3">
+              <div class="text-right">
+                <div class="text-[10px] text-slate-400 uppercase">Baseline Readiness</div>
+                <div id="diag-readiness-score" class="text-lg font-bold text-indigo-400 font-mono">58%</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800 text-xs text-slate-300 mb-5 leading-relaxed">
+            <strong class="text-indigo-300">Cognitive Summary:</strong> <span id="diag-cognitive-summary">Analyzing student mental models...</span>
+          </div>
+
+          <!-- Gaps Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left">
+              <thead>
+                <tr class="text-[10px] uppercase font-mono text-slate-400 border-b border-slate-800">
+                  <th class="py-2.5 px-3">Identified Concept</th>
+                  <th class="py-2.5 px-3">Severity</th>
+                  <th class="py-2.5 px-3">Mastery</th>
+                  <th class="py-2.5 px-3">Bloom's Depth</th>
+                  <th class="py-2.5 px-3">Diagnosed Misconception & Remedy</th>
+                </tr>
+              </thead>
+              <tbody id="gaps-table-body">
+                <!-- Dynamically rendered rows -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Actions -->
+          <div class="mt-6 pt-4 border-t border-slate-800 flex items-center justify-between">
+            <button type="button" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 transition" onclick="switchSection('profile')">
+              <i class="fas fa-arrow-left mr-1.5"></i>Edit Profile
+            </button>
+            <button type="button" id="btn-generate-path" class="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition shadow-lg shadow-indigo-600/30 flex items-center">
+              <i class="fas fa-route mr-2"></i>Synthesize Personalized Skill Roadmap
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: Bloom's Radar & Strengths -->
+        <div class="lg:col-span-4 space-y-6">
+          <!-- Radar Chart Card -->
+          <div class="glass-card rounded-2xl p-5 border border-slate-800/80">
+            <h4 class="text-xs font-bold text-slate-200 uppercase tracking-wider mb-2 flex items-center">
+              <i class="fas fa-chart-pie text-indigo-400 mr-2"></i>Bloom's Taxonomy Mastery
+            </h4>
+            <div class="h-60 w-full relative">
+              <canvas id="radarMasteryChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Confirmed Strengths Card -->
+          <div class="glass-card rounded-2xl p-5 border border-slate-800/80">
+            <h4 class="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-3 flex items-center">
+              <i class="fas fa-check-double mr-2"></i>Identified Baseline Strengths
+            </h4>
+            <ul id="diag-strengths-container" class="space-y-2">
+              <!-- Dynamically populated -->
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: Dynamic Adaptive Skill Tree / Roadmap -->
+    <section id="section-roadmap" class="app-section hidden">
+      <div class="glass-card rounded-2xl p-6 border border-slate-800/80 mb-6">
+        <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-800">
+          <div>
+            <span class="text-[10px] font-mono uppercase tracking-wider text-indigo-400 font-semibold">Personalized Directed Acyclic Graph (DAG)</span>
+            <h3 id="path-subject-title" class="text-lg font-bold text-slate-100">Dynamic Learning Roadmap</h3>
+          </div>
+          <div class="flex items-center space-x-3 text-xs">
+            <span id="path-total-hours" class="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-indigo-300 font-mono">6 Hours Estimated</span>
+            <button type="button" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition" onclick="generateCurriculumPath()">
+              <i class="fas fa-sync-alt mr-1 text-slate-400"></i>Re-Sequence Path
+            </button>
+          </div>
+        </div>
+
+        <p class="text-xs text-slate-400 my-4 leading-relaxed">
+          This roadmap dynamically updates as you pass assessments or reveal misconceptions. 
+          Remedial nodes are automatically injected into the sequence if gaps emerge.
+        </p>
+
+        <!-- Learning Nodes Container -->
+        <div id="learning-nodes-container" class="mt-6">
+          <!-- Dynamically populated milestone cards -->
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: Assessment Runner -->
+    <section id="section-assessment" class="app-section hidden">
+      <div id="quiz-runner-container" class="max-w-3xl mx-auto">
+        <!-- Rendered dynamically by assessment.js -->
+        <div class="glass-card rounded-2xl p-12 text-center border border-slate-800/80">
+          <div class="inline-block p-4 rounded-full bg-slate-900 border border-slate-800 text-slate-400 text-2xl mb-4">
+            <i class="fas fa-clipboard-check"></i>
+          </div>
+          <h3 class="text-base font-semibold text-slate-200 mb-2">No Active Assessment Selected</h3>
+          <p class="text-xs text-slate-400 max-w-sm mx-auto mb-6">
+            Head to the Skill Tree and click "Take Assessment" on any ready node to begin your adaptive diagnostic.
+          </p>
+          <button type="button" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition" onclick="switchSection('roadmap')">
+            <i class="fas fa-project-diagram mr-2"></i>Go to Skill Tree
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: Socratic AI Tutor -->
+    <section id="section-tutor" class="app-section hidden">
+      <div class="max-w-4xl mx-auto glass-card rounded-2xl border border-slate-800/80 flex flex-col h-[750px]">
+        <!-- Tutor Header -->
+        <div class="p-4 border-b border-slate-800/80 flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white text-sm font-bold glow-indigo">
+              <i class="fas fa-user-graduate"></i>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-100 flex items-center">
+                Socratic AI Mentor <span class="ml-2 px-2 py-0.5 rounded-full text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Pedagogical Guardrails Active</span>
+              </h3>
+              <p class="text-[11px] text-slate-400">Never spoon-feeds code; guides you to first-principles conceptual breakthroughs.</p>
+            </div>
+          </div>
+          <span id="tutor-active-node-badge" class="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-xs font-mono text-indigo-300">
+            Focus: General Topic
+          </span>
+        </div>
+
+        <!-- Chat Messages Area -->
+        <div id="tutor-chat-messages" class="flex-1 p-5 overflow-y-auto space-y-4">
+          <!-- Initial Welcome Message -->
+          <div class="flex items-start space-x-2 text-xs justify-start">
+            <div class="w-7 h-7 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold flex-shrink-0 glow-indigo">
+              <i class="fas fa-robot"></i>
+            </div>
+            <div class="max-w-[85%] p-3.5 rounded-2xl bg-slate-900 border border-slate-800 text-slate-200 leading-relaxed shadow-sm">
+              Hello Alex! I am your Socratic AI Mentor. My goal is to guide you toward true intuition rather than quick copy-paste answers.<br><br>
+              What concept or question are you currently grappling with? Walk me through what you understand so far, and where the fog begins.
+            </div>
+          </div>
+        </div>
+
+        <!-- Tutor Input Box -->
+        <div class="p-4 border-t border-slate-800/80 bg-slate-950/60 rounded-b-2xl">
+          <form id="tutor-form" class="flex items-center space-x-3">
+            <input type="text" id="tutor-user-input" placeholder="Ask a question or explain your intuition on a concept..." class="flex-1 px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-100 focus:outline-none focus:border-indigo-500">
+            <button type="submit" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition shadow-md shadow-indigo-600/30 flex items-center">
+              <i class="fas fa-paper-plane mr-1.5"></i>Send
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="w-full border-t border-slate-800/60 py-4 mt-auto text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div>PromptWars X Agent X 2.0 • PS04: Personalized AI Learning Agent</div>
+      <div class="text-[11px] text-slate-400 font-mono">CogniPath AI Multi-Agent Architecture • Vercel Ready</div>
+    </div>
+  </footer>
+
+  <!-- Application JS -->
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
